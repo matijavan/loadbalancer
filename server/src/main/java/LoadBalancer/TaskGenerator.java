@@ -3,7 +3,9 @@ package LoadBalancer;
 import LoadBalancer.Model.Task;
 
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 
+import static LoadBalancer.Model.GlobalVariables.nodeReceiverList;
 import static LoadBalancer.Model.GlobalVariables.taskCount;
 
 public class TaskGenerator implements Runnable{
@@ -13,13 +15,20 @@ public class TaskGenerator implements Runnable{
 
     @Override
     public void run() {
+        System.out.println("Rodio se taskgenerator od Node 1");
+        try {
+            Thread.sleep(1000); //potrebno da se kreiraju prvo svi workeri i recieveri i generaotri
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         while(true){
             int taskID = taskCount.incrementAndGet();
             Task task = generateTask(taskID);
-            NodeReciever nodeReciever =
-            sendTaskToQueue(task, get);
+            NodeReceiver nodeReceiver = findNodeReciever(TaskGeneratorNumber);
+            sendTaskToQueue(task, nodeReceiver.getTaskQueue());
+            System.out.println("spawnao sam task " + taskID);
             try {
-                Thread.sleep(3000);
+                Thread.sleep(1500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -60,6 +69,19 @@ public class TaskGenerator implements Runnable{
     public Task generateTask(int taskCount){
         Task task = new Task(taskCount, taskLength);
         return task;
+    }
+
+    public NodeReceiver findNodeReciever(int number) {
+        for (NodeReceiver nr : nodeReceiverList) {
+            if (nr.getNodeReceiverNumber() == number) {
+                return nr;
+            }
+        }
+        return null;
+    }
+
+    public void sendTaskToQueue(Task task, BlockingQueue<Task> taskQueue){
+        taskQueue.offer(task);
     }
 
 
