@@ -1,38 +1,91 @@
-.App {
-  text-align: center;
+/* Layout */
+.container {
+  padding: 2rem;
+  font-family: Arial, sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Buttons */
+.button-bar {
+  margin-bottom: 1.5rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.sim-btn {
+  margin-right: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.start {
+  background-color: #4CAF50;
   color: white;
+  border: none;
 }
 
-.App-link {
-  color: #61dafb;
+.stop {
+  background-color: #f44336;
+  color: white;
+  border: none;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.pause {
+  background-color: #ff9800;
+  color: white;
+  border: none;
+}
+
+/* Table */
+.node-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 2px solid white;        /* Outer border */
+}
+
+.node-table th,
+.node-table td {
+  padding: 0.75rem;
+  border: 1px solid white;        /* Column separators + row separators */
+}
+
+.node-table th {
+  background: black;
+  color: white;
+  text-align: left;
+}
+
+
+/* Sliders */
+.slider {
+  width: 100%;
+}
+
+/* Trash Button */
+.trash-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #444;
+  padding: 4px;
+}
+
+.trash-btn:hover {
+  color: #c00;
+}
+
+/* Add Node Row */
+.add-row td {
+  padding: 0.75rem;
+}
+
+.add-node-btn {
+  background:cornflowerblue ;
+  opacity: 0.9;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  width: 120px;
+}
+
+/* Layout for table and external controls */
+.add-node-container {
+  margin-top: 0.75rem;
 }
