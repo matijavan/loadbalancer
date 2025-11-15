@@ -12,7 +12,7 @@ public class NodeWorker implements Runnable{
     private Task taskCurrentlyBeingProcessed;
     @Override
     public void run() {
-        System.out.println("Rodio se worker od node 1");
+        System.out.println("Rodio se worker od node " + NodeWorkerNumber);
         while(true){
             NodeReceiver nodeReceiver = findNodeReceiver(NodeWorkerNumber);
             Task task = null;
@@ -22,8 +22,9 @@ public class NodeWorker implements Runnable{
                 throw new RuntimeException(e);
             }
             try {
-                System.out.println("radim posao " + task.getID() + ", spavamo " + task.getLength() + "ms.");
+                System.out.println("Worker " + NodeWorkerNumber + ": radim posao " + task.getID() + ", spavamo " + task.getLength() + "ms.");
                 Thread.sleep(task.getLength());
+                System.out.println("Worker " + NodeWorkerNumber + ": posao " + task.getID() + " je obavljen.");
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

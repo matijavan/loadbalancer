@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class NodeReceiver implements Runnable{
     @Override
     public void run() {
-        System.out.println("Rodio se reciever od node 1");
+        System.out.println("Rodio se reciever od node " + getNodeReceiverNumber());
         while(true){
             try {
                 Thread.sleep(5);

@@ -15,7 +15,7 @@ public class TaskGenerator implements Runnable{
 
     @Override
     public void run() {
-        System.out.println("Rodio se taskgenerator od Node 1");
+        System.out.println("Rodio se taskgenerator od Node " + getTaskGeneratorNumber());
         try {
             Thread.sleep(1000); //potrebno da se kreiraju prvo svi workeri i recieveri i generaotri
         } catch (InterruptedException e) {
@@ -26,9 +26,9 @@ public class TaskGenerator implements Runnable{
             Task task = generateTask(taskID);
             NodeReceiver nodeReceiver = findNodeReciever(TaskGeneratorNumber);
             sendTaskToQueue(task, nodeReceiver.getTaskQueue());
-            System.out.println("spawnao sam task " + taskID);
+            System.out.println("Generator " + getTaskGeneratorNumber() + ": spawnao sam task " + taskID);
             try {
-                Thread.sleep(1500);
+                Thread.sleep(getTaskFrequency());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
