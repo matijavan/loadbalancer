@@ -1,9 +1,5 @@
 package LoadBalancer.Model;
 
-import LoadBalancer.NodeReceiver;
-import LoadBalancer.NodeWorker;
-import LoadBalancer.TaskGenerator;
-
 import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -12,12 +8,21 @@ public class GlobalVariables {
     public static LinkedList<NodeReceiver> nodeReceiverList = new LinkedList<>();
     public static LinkedList<NodeWorker> nodeWorkerList = new LinkedList<>();
     public static LinkedList<TaskGenerator> taskGeneratorList = new LinkedList<>();
+    public static int nodeCount = 0;
 
     public AtomicInteger getTaskCount() {
         return taskCount;
     }
     public void setTaskCount(AtomicInteger taskCount) {
         this.taskCount = taskCount;
+    }
+
+    public static int getNodeCount() {
+        return nodeCount;
+    }
+
+    public static void setNodeCount(int nodeCount) {
+        GlobalVariables.nodeCount = nodeCount;
     }
 
     public static LinkedList<NodeReceiver> getNodeReceiverList() {

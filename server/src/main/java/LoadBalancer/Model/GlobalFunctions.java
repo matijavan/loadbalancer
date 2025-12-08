@@ -1,7 +1,5 @@
 package LoadBalancer.Model;
 
-import LoadBalancer.NodeReceiver;
-
 import static LoadBalancer.Model.GlobalVariables.nodeReceiverList;
 
 public class GlobalFunctions {
