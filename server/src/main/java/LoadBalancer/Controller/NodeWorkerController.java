@@ -20,14 +20,14 @@ import static LoadBalancer.Model.GlobalVariables.nodeCount;
 public class NodeWorkerController {
     private final NodeWorkerService nodeWorkerService;
 
-    @PostMapping("createnodeworker")
+    @PostMapping("add")
     public ResponseEntity<?> addNodeWorker(){
         NodeWorker nodeWorker = new NodeWorker(nodeCount);
         nodeWorkerService.createNodeWorker(nodeCount);
         return ResponseEntity.ok("Created NodeWorker number" + nodeCount);
     }
     
-    @DeleteMapping("deletenodeworker")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<?> deleteNodeWorker(){
         NodeWorker nodeWorker = new NodeWorker(nodeCount);
         nodeWorkerService.deleteNodeWorker(nodeCount);

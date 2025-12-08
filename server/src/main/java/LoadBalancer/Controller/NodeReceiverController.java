@@ -18,13 +18,13 @@ import static LoadBalancer.Model.GlobalVariables.nodeCount;
 public class NodeReceiverController {
     private final NodeReceiverService nodeReceiverService;
 
-    @RequestMapping("createnodereceiver")
+    @RequestMapping("add")
     public ResponseEntity<?> addNodeReceiver(){
         nodeReceiverService.createNodeReceiver(nodeCount);
         return ResponseEntity.ok("created NodeReceiver number" + nodeCount);
     }
 
-    @DeleteMapping("deletenodereceiver")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<?> deleteNodeReceiver(){
         nodeReceiverService.deleteNodeReceiver(nodeCount);
         return ResponseEntity.ok("created NodeReceiver number" + nodeCount);
