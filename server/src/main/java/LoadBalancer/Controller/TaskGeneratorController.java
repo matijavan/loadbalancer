@@ -22,9 +22,9 @@ public class TaskGeneratorController {
     }
 
     @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> deleteTaskGenerator(){
-        taskGeneratorService.deleteTaskGenerator(nodeCount);
-        return ResponseEntity.ok("deleted TaskGenerator number" + nodeCount);
+    public ResponseEntity<?> deleteTaskGenerator(@PathVariable int id){
+        taskGeneratorService.deleteTaskGenerator(id);
+        return ResponseEntity.ok("deleted TaskGenerator number" + id);
     }
 
 }
