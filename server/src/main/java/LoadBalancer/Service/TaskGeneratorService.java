@@ -58,7 +58,7 @@ public class TaskGeneratorService implements Runnable{
 
         while(true){
             int taskID = taskCount.incrementAndGet();
-            Task task = generateTask(taskGenerator.getTaskLength());
+            Task task = generateTask(taskID, taskGenerator.getTaskLength());
 
             sendTaskToQueue(task, nodeReciever.getTaskQueue());
             System.out.println("Generator " + taskGenerator.getTaskGeneratorNumber() + ": spawned task " + taskID);
