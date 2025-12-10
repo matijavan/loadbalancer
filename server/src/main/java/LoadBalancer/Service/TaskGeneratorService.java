@@ -5,6 +5,7 @@ import LoadBalancer.Model.Task;
 import LoadBalancer.Model.TaskGenerator;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,13 +24,25 @@ public class TaskGeneratorService implements Runnable{
     }
 
     public void deleteTaskGenerator(int nodeNumber){
-        int indexToRemove = nodeNumber-1;
+        int indexToRemove = nodeNumber - 1;
         taskGeneratorList.remove(indexToRemove);
 
         for(int i = indexToRemove; i < taskGeneratorList.size(); i++){
             TaskGenerator taskgenerator = taskGeneratorList.get(i);
             taskgenerator.setTaskGeneratorNumber(taskgenerator.getTaskGeneratorNumber() - 1);
         }
+    }
+
+    public void changeTaskGeneratorFrequency(int nodeID, int newFrequency){
+        int indexToChange = nodeID - 1;
+        TaskGenerator taskgenerator = taskGeneratorList.get(indexToChange);
+        taskgenerator.setTaskFrequency(newFrequency);
+    }
+
+    public void changeTaskGeneratorLength(int nodeID, int newLength){
+        int indexToChange = nodeID - 1;
+        TaskGenerator taskgenerator = taskGeneratorList.get(indexToChange);
+        taskgenerator.setTaskLength(newLength);
     }
 
     public void runGenerator(TaskGenerator taskGenerator){
@@ -62,9 +75,17 @@ public class TaskGeneratorService implements Runnable{
     }
 
 
-    public Task generateTask(int taskCount){
-        Task task = new Task(taskCount, 3000); //3000 ms za test
+    public Task generateTask(int taskCount, int taskLength){
+        Random rand = new Random();
+        int randTaskLength = taskLength +=rand.nextInt(101) - 50;
+        Task task = new Task(taskCount, randTaskLength); //3000 ms za test
         return task;
+    }
+
+    public int generateSleepLength(int taskFrequency){
+        Random rand = new Random();
+        int randSleepLength = rand.nextInt(101) - 50 + taskFrequency;
+        return randSleepLength;
     }
 
     public NodeReceiver findNodeReciever(int number) {
