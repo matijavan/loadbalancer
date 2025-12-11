@@ -45,6 +45,12 @@ public class TaskGeneratorService implements Runnable{
         taskgenerator.setTaskLength(newLength);
     }
 
+    public void startAllTaskGenerators(){
+        for (TaskGenerator tg : taskGeneratorList) {
+            new Thread(() -> runGenerator(tg)).start();
+        }
+    }
+
     public void runGenerator(TaskGenerator taskGenerator){
         System.out.println("Spawned TaskGenerator for Node " + taskGenerator.getTaskGeneratorNumber());
         try {
@@ -62,13 +68,9 @@ public class TaskGeneratorService implements Runnable{
 
             sendTaskToQueue(task, nodeReciever.getTaskQueue());
             System.out.println("Generator " + taskGenerator.getTaskGeneratorNumber() + ": spawned task " + taskID);
-
-            try{
-                System.out.println("Starting processing task " + taskID);
-                Thread.sleep(taskGenerator.getTaskFrequency());
-                System.out.println("Finished processing task " + taskID);
-            }
-            catch (InterruptedException e){
+            try {
+                Thread.sleep(generateSleepLength(taskGenerator.getTaskFrequency()));
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }

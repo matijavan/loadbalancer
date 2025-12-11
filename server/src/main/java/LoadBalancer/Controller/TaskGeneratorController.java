@@ -34,7 +34,6 @@ public class TaskGeneratorController {
     public ResponseEntity<?> frequencyTaskGenerator(@PathVariable int id, @RequestBody TaskFrequencyRequest taskFrequencyRequest){
         int newFrequency = taskFrequencyRequest.getTaskFrequency();
         taskGeneratorService.changeTaskGeneratorFrequency(id, newFrequency);
-
         return ResponseEntity.ok("updated Task Frequency of node " + id + " to " + newFrequency);
     }
 
@@ -45,4 +44,9 @@ public class TaskGeneratorController {
         return ResponseEntity.ok("updated Task Length of node " + id + " to " + newLength);
     }
 
+    @PostMapping("/startall")
+    public ResponseEntity<?> startAllTaskGenerators(){
+        taskGeneratorService.startAllTaskGenerators();
+        return ResponseEntity.ok("Started all Task Generators");
+    }
 }

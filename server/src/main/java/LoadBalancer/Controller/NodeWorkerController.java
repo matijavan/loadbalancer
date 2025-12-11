@@ -27,4 +27,10 @@ public class NodeWorkerController {
         nodeWorkerService.deleteNodeWorker(id);
         return ResponseEntity.ok("Deleted NodeWorker number" + id);
     }
+
+    @PostMapping("/startall")
+    public ResponseEntity<?> startAllNodeWorkers(){
+        nodeWorkerService.startAllWorkers();
+        return ResponseEntity.ok("Started all Node Workers");
+    }
 }

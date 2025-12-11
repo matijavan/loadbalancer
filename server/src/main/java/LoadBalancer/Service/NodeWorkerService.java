@@ -5,6 +5,8 @@ import LoadBalancer.Model.NodeWorker;
 import LoadBalancer.Model.Task;
 import LoadBalancer.Model.TaskGenerator;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -12,6 +14,9 @@ import static LoadBalancer.Model.GlobalVariables.*;
 
 @Service
 public class NodeWorkerService implements Runnable{
+
+    private static final Logger logger = LoggerFactory.getLogger(TaskGeneratorService.class);
+
     @Override
     public void run() {
 
@@ -33,6 +38,29 @@ public class NodeWorkerService implements Runnable{
         }
 
         setNodeCount(nodeCount - 1);
+    }
+
+    public void startAllWorkers(){
+        for (NodeWorker nw : nodeWorkerList) {
+            new Thread(() -> runWorker(nw)).start();
+        }
+    }
+
+    public void runWorker(NodeWorker nodeWorker){
+        System.out.println("Spawned Worker for Node " + nodeWorker.getNodeWorkerNumber());
+        NodeReceiver nodeReceiver = findNodeReceiver(nodeWorker.getNodeWorkerNumber());
+        while(true){
+            try {
+                Task task = takeTaskFromQueue(nodeReceiver.getTaskQueue());
+                logger.info("Worker " + nodeWorker.getNodeWorkerNumber() +
+                        " got task ID " + task.getID() + ", working task for "
+                        + task.getLength() +"ms.");
+                Thread.sleep(task.getLength());
+                logger.info("Worker done with task " + task.getID());
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public Task takeTaskFromQueue(BlockingQueue<Task> taskQueue) throws InterruptedException {

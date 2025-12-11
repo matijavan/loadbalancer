@@ -25,4 +25,10 @@ public class NodeReceiverController {
         nodeReceiverService.deleteNodeReceiver(id);
         return ResponseEntity.ok("deleted NodeReceiver number" + id);
     }
+
+    @PostMapping("/startall")
+    public ResponseEntity<?> startAllNodeReceivers(){
+        nodeReceiverService.startAllReceivers();
+        return ResponseEntity.ok("Started all Node Receivers");
+    }
 }
