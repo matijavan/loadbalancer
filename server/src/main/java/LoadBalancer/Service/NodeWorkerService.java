@@ -13,7 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import static LoadBalancer.Model.GlobalVariables.*;
 
 @Service
-public class NodeWorkerService implements Runnable{
+public class NodeWorkerService implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGeneratorService.class);
 
@@ -22,17 +22,17 @@ public class NodeWorkerService implements Runnable{
 
     }
 
-    public void createNodeWorker(int nodeCount){
+    public void createNodeWorker(int nodeCount) {
         NodeWorker nodeworker = new NodeWorker(nodeCount);
         nodeWorkerList.add(nodeworker);
-        setNodeCount(nodeCount + 1); //nodeworker se zadnji kreira pa onda inkrementiram nodeCount
+        setNodeCount(nodeCount + 1); // nodeworker se zadnji kreira pa onda inkrementiram nodeCount
     }
 
-    public void deleteNodeWorker(int nodeNumber){
-        int indexToRemove = nodeNumber-1;
+    public void deleteNodeWorker(int nodeNumber) {
+        int indexToRemove = nodeNumber - 1;
         nodeWorkerList.remove(indexToRemove);
 
-        for(int i = indexToRemove; i < nodeWorkerList.size(); i++){
+        for (int i = indexToRemove; i < nodeWorkerList.size(); i++) {
             NodeWorker nodeWorker = nodeWorkerList.get(i);
             nodeWorker.setNodeWorkerNumber(nodeWorker.getNodeWorkerNumber() - 1);
         }
@@ -40,21 +40,27 @@ public class NodeWorkerService implements Runnable{
         setNodeCount(nodeCount - 1);
     }
 
-    public void startAllWorkers(){
+    public void startAllWorkers() {
         for (NodeWorker nw : nodeWorkerList) {
             new Thread(() -> runWorker(nw)).start();
         }
     }
 
-    public void runWorker(NodeWorker nodeWorker){
+    public void stopAllWorkers() {
+        for (NodeWorker nw : nodeWorkerList) {
+            // ovdje treba implementirati logiku za zaustavljanje radnika
+        }
+    }
+
+    public void runWorker(NodeWorker nodeWorker) {
         System.out.println("Spawned Worker for Node " + nodeWorker.getNodeWorkerNumber());
         NodeReceiver nodeReceiver = findNodeReceiver(nodeWorker.getNodeWorkerNumber());
-        while(true){
+        while (true) {
             try {
                 Task task = takeTaskFromQueue(nodeReceiver.getTaskQueue());
                 logger.info("Worker " + nodeWorker.getNodeWorkerNumber() +
                         " got task ID " + task.getID() + ", working task for "
-                        + task.getLength() +"ms.");
+                        + task.getLength() + "ms.");
                 Thread.sleep(task.getLength());
                 logger.info("Worker done with task " + task.getID());
             } catch (InterruptedException e) {

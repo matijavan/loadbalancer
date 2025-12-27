@@ -19,33 +19,37 @@ public class TaskGeneratorController {
     private final TaskGeneratorService taskGeneratorService;
 
     @PostMapping("/add")
-    public ResponseEntity<?> addTaskGenerator(){
+    public ResponseEntity<?> addTaskGenerator() {
         taskGeneratorService.createTaskGenerator(nodeCount);
         return ResponseEntity.ok("created TaskGenerator number" + nodeCount);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteTaskGenerator(@PathVariable int id){
+    public ResponseEntity<?> deleteTaskGenerator(@PathVariable int id) {
         taskGeneratorService.deleteTaskGenerator(id);
         return ResponseEntity.ok("deleted TaskGenerator number" + id);
     }
 
-    @PostMapping("/frequency/{id}")
-    public ResponseEntity<?> frequencyTaskGenerator(@PathVariable int id, @RequestBody TaskFrequencyRequest taskFrequencyRequest){
-        int newFrequency = taskFrequencyRequest.getTaskFrequency();
-        taskGeneratorService.changeTaskGeneratorFrequency(id, newFrequency);
-        return ResponseEntity.ok("updated Task Frequency of node " + id + " to " + newFrequency);
+    @PostMapping("/frequency")
+    public ResponseEntity<?> frequencyTaskGenerator(@RequestBody TaskFrequencyRequest taskFrequencyRequest) {
+        int nodeNumber = taskFrequencyRequest.getNodeNumber();
+        int newFrequency = taskFrequencyRequest.getFrequency();
+        System.out.println("Node: " + nodeNumber + ", Frequency: " + newFrequency);
+        taskGeneratorService.changeTaskGeneratorFrequency(nodeNumber, newFrequency);
+        return ResponseEntity.ok("updated Task Frequency of node " + nodeNumber + " to " + newFrequency);
     }
 
-    @PostMapping("/length/{id}")
-    public ResponseEntity<?> lengthTaskGenerator(@PathVariable int id, @RequestBody TaskLengthRequest taskLengthRequest){
-        int newLength = taskLengthRequest.getTaskLength();
-        taskGeneratorService.changeTaskGeneratorLength(id, newLength);
-        return ResponseEntity.ok("updated Task Length of node " + id + " to " + newLength);
+    @PostMapping("/length")
+    public ResponseEntity<?> lengthTaskGenerator(@RequestBody TaskLengthRequest taskLengthRequest) {
+        int nodeNumber = taskLengthRequest.getNodeNumber();
+        int newLength = taskLengthRequest.getLength();
+        System.out.println("Node: " + nodeNumber + ", Length: " + newLength);
+        taskGeneratorService.changeTaskGeneratorLength(nodeNumber, newLength);
+        return ResponseEntity.ok("updated Task Length of node " + nodeNumber + " to " + newLength);
     }
 
     @PostMapping("/startall")
-    public ResponseEntity<?> startAllTaskGenerators(){
+    public ResponseEntity<?> startAllTaskGenerators() {
         taskGeneratorService.startAllTaskGenerators();
         return ResponseEntity.ok("Started all Task Generators");
     }

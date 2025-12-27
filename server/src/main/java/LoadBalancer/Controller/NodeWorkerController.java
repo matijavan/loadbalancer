@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static LoadBalancer.Model.GlobalVariables.nodeCount;
+import static LoadBalancer.Model.GlobalVariables.nodeWorkerList;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,22 +16,38 @@ import static LoadBalancer.Model.GlobalVariables.nodeCount;
 public class NodeWorkerController {
     private final NodeWorkerService nodeWorkerService;
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllNodeWorkers() {
+        System.out.println("Returning " + nodeWorkerList.size() + " nodes");
+        return ResponseEntity.ok(nodeWorkerList);
+    }
+
     @PostMapping("/add")
-    public ResponseEntity<?> addNodeWorker(){
+    public ResponseEntity<?> addNodeWorker() {
+        System.out.println("Adding node number " + nodeCount);
         NodeWorker nodeWorker = new NodeWorker(nodeCount);
         nodeWorkerService.createNodeWorker(nodeCount);
-        return ResponseEntity.ok("Created NodeWorker number" + nodeCount);
+        return ResponseEntity.ok(nodeWorkerList);
     }
-    
+
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteNodeWorker(@PathVariable int id){
+    public ResponseEntity<?> deleteNodeWorker(@PathVariable int id) {
+        System.out.println("Deleted node " + id);
         nodeWorkerService.deleteNodeWorker(id);
-        return ResponseEntity.ok("Deleted NodeWorker number" + id);
+        return ResponseEntity.ok(nodeWorkerList);
     }
 
     @PostMapping("/startall")
-    public ResponseEntity<?> startAllNodeWorkers(){
+    public ResponseEntity<?> startAllNodeWorkers() {
+        System.out.println("Starting all workers");
         nodeWorkerService.startAllWorkers();
         return ResponseEntity.ok("Started all Node Workers");
+    }
+
+    @PostMapping("/stopall")
+    public ResponseEntity<?> stopAllNodeWorkers() {
+        System.out.println("Stopping all workers");
+        nodeWorkerService.stopAllWorkers();
+        return ResponseEntity.ok("Stopped all Node Workers");
     }
 }

@@ -1,13 +1,22 @@
 package LoadBalancer.DTO;
 
 public class TaskFrequencyRequest {
-    public int taskFrequency;
+    public int nodeNumber;
+    public int frequency;
 
-    public int getTaskFrequency() {
-        return taskFrequency;
+    public int getNodeNumber() {
+        return nodeNumber;
     }
 
-    public void setTaskFrequency(int taskFrequency) {
-        this.taskFrequency = taskFrequency;
+    public void setNodeNumber(int nodeNumber) {
+        this.nodeNumber = nodeNumber;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
     }
 }

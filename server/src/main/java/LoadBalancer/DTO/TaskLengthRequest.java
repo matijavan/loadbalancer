@@ -1,13 +1,22 @@
 package LoadBalancer.DTO;
 
 public class TaskLengthRequest {
-    public int taskLength;
+    public int nodeNumber;
+    public int length;
 
-    public int getTaskLength() {
-        return taskLength;
+    public int getNodeNumber() {
+        return nodeNumber;
     }
 
-    public void setTaskLength(int taskLength) {
-        this.taskLength = taskLength;
+    public void setNodeNumber(int nodeNumber) {
+        this.nodeNumber = nodeNumber;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
     }
 }
