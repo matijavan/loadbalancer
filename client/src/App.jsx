@@ -27,6 +27,10 @@ export default function App() {
 
   useEffect(() => {
     fetchNodes();
+
+    //svakih 100ms da se updatea samo load svakog nodea
+    const interval = setInterval(fetchNodeLoads, 100); 
+    return () => clearInterval(interval);
   }, []);
 
   // fetchanje sa backenda
@@ -41,6 +45,7 @@ export default function App() {
         freq: n.freq ?? n.frequency ?? n.taskFrequency ?? 50,
         length: n.length ?? n.length ?? n.taskLength ?? 50,
         load: n.load ?? n.queue ?? 0,
+        capacity: n.capacity ?? 50,
         // za debugging (inace ne treba)
         __raw: n
       }));
@@ -53,6 +58,24 @@ export default function App() {
       setLoading(false);
     }
   };
+
+  const fetchNodeLoads = async() => {
+    try {
+      const response = await fetch(`${API_BASE}/nodereceiver/load`);
+      const data = await response.json();
+      logApiCall("GET", "/nodereceiver/load", null, data);
+      setNodes(prevNodes =>
+      prevNodes.map((node, idx) => ({
+        ...node,
+        load: data[idx] ?? node.load ?? 0 // keep old load if missing
+      }))
+    );
+    }
+
+    catch(error) {
+      console.error("Failed to fetch node loads:", error)
+    }
+  }
 
   // helper za normalizaciju node podataka iz razlicitih endpointa
   const normalizeNodes = (data) =>
@@ -122,24 +145,35 @@ export default function App() {
 
     // onda se salje update na backend
     try {
-      const endpoint = field === "freq" ? "/taskgenerator/frequency" : "/taskgenerator/length";
-      const requestBody = {
-        nodeNumber: id,
-        [field === "freq" ? "frequency" : "length"]: numValue
-      };
+      //pomoćna mapa preko koje se skonta što updateamo u nodeu
+      const fieldMap = {
+      freq: { endpoint: "/taskgenerator/frequency", key: "frequency" },
+      length: { endpoint: "/taskgenerator/length", key: "length" },
+      capacity: { endpoint: "/nodereceiver/capacity", key: "capacity" }
+    };
 
-      const response = await fetch(`${API_BASE}${endpoint}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody)
-      });
-      
-      const data = await tryParse(response);
-      logApiCall(`POST`, endpoint, requestBody, data);
-    } catch (error) {
-      logApiCall("POST", field === "freq" ? "/taskgenerator/frequency" : "/taskgenerator/length", 
-                 { nodeNumber: id }, null, error.message);
-      console.error(`Failed to update ${field}:`, error);
+    if(!fieldMap[field]) throw new Error(`Unknown field: ${field}`);
+
+    const {endpoint, key} = fieldMap[field];
+
+    const requestBody = {
+      nodeNumber: id,
+      [key]: numValue
+    };
+
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody)
+    });
+    
+    const data = await tryParse(response);
+    
+    logApiCall(`POST`, endpoint, requestBody, data);
+  } catch (error) {
+    logApiCall("POST", field === "freq" ? "/taskgenerator/frequency" : "/taskgenerator/length", 
+                { nodeNumber: id }, null, error.message);
+    console.error(`Failed to update ${field}:`, error);
     }
   };
 
@@ -175,13 +209,31 @@ export default function App() {
 
   const startSimulation = async () => {
     try {
-      const response = await fetch(`${API_BASE}/nodeworker/startall`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" }
-      });
-      const data = await tryParse(response);
-      logApiCall("POST", "/nodeworker/startall", null, data);
-      setSimulationRunning(true);
+      //prvo starta task generatore
+    let response = await fetch(`${API_BASE}/taskgenerator/startall`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    let data = await tryParse(response);
+    logApiCall("POST", "/taskgenerator/startall", null, data);
+
+      //onda starta node receivere
+    response = await fetch(`${API_BASE}/nodereceiver/startall`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    data = await tryParse(response);
+    logApiCall("POST", "/nodereceiver/startall", null, data);
+
+    //onda starta node workere
+    response = await fetch(`${API_BASE}/nodeworker/startall`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    data = await tryParse(response);
+    logApiCall("POST", "/nodeworker/startall", null, data)
+
+    setSimulationRunning(true);
     } catch (error) {
       logApiCall("POST", "/nodeworker/startall", null, null, error.message);
       console.error("Failed to start simulation:", error);
@@ -237,6 +289,7 @@ export default function App() {
               <th>Task Frequency</th>
               <th>Task Length</th>
               <th>Queue / Load</th>
+              <th>Capacity</th>
               <th></th>
             </tr>
           </thead>
@@ -274,7 +327,22 @@ export default function App() {
                     />
                   </td>
 
-                  <td>{node.load ?? 0}%</td>
+                  <td>{(node.load * 100).toFixed(0) ?? 0}%</td>
+
+                  <td>
+                    <input
+                      type="number"
+                      step="1"
+                      min="1"
+                      value={node.capacity ?? 50}
+                      inputmode="numeric"
+                      pattern="[0-9]*"
+                      style={{width: "6ch"}}
+                      onChange={(e) =>
+                        updateNode(displayId, "capacity", e.target.value)
+                      }
+                      />
+                  </td>
 
                   <td>
                     <button

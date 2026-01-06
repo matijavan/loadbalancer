@@ -32,14 +32,12 @@ public class NodeWorkerController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteNodeWorker(@PathVariable int id) {
-        System.out.println("Deleted node " + id);
         nodeWorkerService.deleteNodeWorker(id);
-        return ResponseEntity.ok(nodeWorkerList);
+        return ResponseEntity.ok("Deleted node worker " + id);
     }
 
     @PostMapping("/startall")
     public ResponseEntity<?> startAllNodeWorkers() {
-        System.out.println("Starting all workers");
         nodeWorkerService.startAllWorkers();
         return ResponseEntity.ok("Started all Node Workers");
     }

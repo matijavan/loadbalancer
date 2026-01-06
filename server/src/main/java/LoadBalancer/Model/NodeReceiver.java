@@ -2,6 +2,7 @@ package LoadBalancer.Model;
 
 import lombok.Data;
 
+import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -11,6 +12,7 @@ public class NodeReceiver{
     private int nodeReceiverNumber;
     private BlockingQueue<Task> taskQueue = new LinkedBlockingQueue<>();
     private int nodeReceiverCapacity;
+    private LinkedList<Double> nodeReceiverLoadHistory = new LinkedList<Double>();
 
 
     public NodeReceiver(int nodeReceiverNumber) {

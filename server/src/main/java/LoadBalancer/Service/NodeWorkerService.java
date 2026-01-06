@@ -15,7 +15,7 @@ import static LoadBalancer.Model.GlobalVariables.*;
 @Service
 public class NodeWorkerService implements Runnable {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskGeneratorService.class);
+    private static final Logger logger = LoggerFactory.getLogger(NodeWorkerService.class);
 
     @Override
     public void run() {
@@ -62,7 +62,7 @@ public class NodeWorkerService implements Runnable {
                         " got task ID " + task.getID() + ", working task for "
                         + task.getLength() + "ms.");
                 Thread.sleep(task.getLength());
-                logger.info("Worker done with task " + task.getID());
+                logger.info("Worker " + nodeWorker.getNodeWorkerNumber() + " done with task " + task.getID());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

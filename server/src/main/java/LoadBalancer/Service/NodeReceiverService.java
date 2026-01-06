@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+
 import static LoadBalancer.Model.GlobalVariables.nodeReceiverList;
 import static LoadBalancer.Model.GlobalVariables.nodeWorkerList;
 
@@ -28,6 +30,33 @@ public class NodeReceiverService implements Runnable {
             NodeReceiver nodeReceiver = nodeReceiverList.get(i);
             nodeReceiver.setNodeReceiverNumber(nodeReceiver.getNodeReceiverNumber() - 1);
         }
+    }
+
+    public double getNodeReceiverLoad(int nodeNumber){
+        NodeReceiver nodeReceiver = nodeReceiverList.get(nodeNumber);
+        double load = (double) nodeReceiver.getTaskQueue().size() / nodeReceiver.getNodeReceiverCapacity();
+        double roundedLoad = Math.round(load * 100.0) / 100.0; //da ga zaokruzi na dve decimale
+        return roundedLoad;
+    }
+
+    public LinkedList<Double> getAllNodeReceiverLoads(){
+        LinkedList<Double> loads = new LinkedList<>();
+        for(NodeReceiver nodeReceiver : nodeReceiverList){
+            loads.add(getNodeReceiverLoad(nodeReceiver.getNodeReceiverNumber()));
+        }
+        return loads;
+    }
+
+    public void updateNodeReceiverLoadHistory(int nodeNumber){
+        NodeReceiver nodeReceiver = nodeReceiverList.get(nodeNumber);
+        LinkedList<Double> loadHistory = nodeReceiver.getNodeReceiverLoadHistory();
+        loadHistory.add(getNodeReceiverLoad(nodeNumber));
+        nodeReceiver.setNodeReceiverLoadHistory(loadHistory);
+    }
+
+    public void changeNodeReceiverCapacity(int nodeNumber, int capacity){
+        NodeReceiver nodeReceiver = nodeReceiverList.get(nodeNumber);
+        nodeReceiver.setNodeReceiverCapacity(capacity);
     }
 
     public void startAllReceivers(){

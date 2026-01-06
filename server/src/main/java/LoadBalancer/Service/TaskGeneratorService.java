@@ -3,6 +3,8 @@ package LoadBalancer.Service;
 import LoadBalancer.Model.NodeReceiver;
 import LoadBalancer.Model.Task;
 import LoadBalancer.Model.TaskGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -13,6 +15,8 @@ import static LoadBalancer.Model.GlobalVariables.*;
 
 @Service
 public class TaskGeneratorService implements Runnable{
+
+    private static final Logger logger = LoggerFactory.getLogger(NodeWorkerService.class);
 
     public void run() {
 
@@ -67,7 +71,7 @@ public class TaskGeneratorService implements Runnable{
             Task task = generateTask(taskID, taskGenerator.getTaskLength());
 
             sendTaskToQueue(task, nodeReciever.getTaskQueue());
-            System.out.println("Generator " + taskGenerator.getTaskGeneratorNumber() + ": spawned task " + taskID);
+            logger.info("Generator " + taskGenerator.getTaskGeneratorNumber() + ": spawned task " + taskID + ", putting in queue");
             try {
                 Thread.sleep(generateSleepLength(taskGenerator.getTaskFrequency()));
             } catch (InterruptedException e) {
@@ -79,14 +83,24 @@ public class TaskGeneratorService implements Runnable{
 
     public Task generateTask(int taskCount, int taskLength){
         Random rand = new Random();
-        int randTaskLength = taskLength +=rand.nextInt(101) - 50;
+        int randTaskLength;
+
+        do{
+            randTaskLength = rand.nextInt(101) - 50 + taskLength;
+        } while(randTaskLength <= 0);
+
         Task task = new Task(taskCount, randTaskLength); //3000 ms za test
         return task;
     }
 
     public int generateSleepLength(int taskFrequency){
         Random rand = new Random();
-        int randSleepLength = rand.nextInt(101) - 50 + taskFrequency;
+        int randSleepLength;
+
+        do{
+            randSleepLength = rand.nextInt(101) + 50 - taskFrequency;
+        } while(randSleepLength <= 0);
+
         return randSleepLength;
     }
 
