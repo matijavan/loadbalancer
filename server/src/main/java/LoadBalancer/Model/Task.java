@@ -1,5 +1,6 @@
 package LoadBalancer.Model;
 
+
 public class Task {
     private int ID;
     private int length; //in milliseconds
