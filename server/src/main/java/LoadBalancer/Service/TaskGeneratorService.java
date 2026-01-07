@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,6 +19,7 @@ import static LoadBalancer.Model.GlobalVariables.*;
 public class TaskGeneratorService implements Runnable{
 
     private static final Logger logger = LoggerFactory.getLogger(NodeWorkerService.class);
+    private final List<Thread> generatorThreads = new LinkedList<>();
 
     public void run() {
 
@@ -51,8 +54,18 @@ public class TaskGeneratorService implements Runnable{
 
     public void startAllTaskGenerators(){
         for (TaskGenerator tg : taskGeneratorList) {
-            new Thread(() -> runGenerator(tg)).start();
+            Thread t = new Thread(() -> runGenerator(tg));
+            generatorThreads.add(t);
+            t.start();
         }
+    }
+
+    public void stopAllTaskGenerators(){
+        for(Thread t : generatorThreads){
+            t.interrupt();
+        }
+        generatorThreads.clear();
+        taskCount.set(0); //stopali smo simulaciju pa idemo ispocetka
     }
 
     public void runGenerator(TaskGenerator taskGenerator){
@@ -61,7 +74,6 @@ public class TaskGeneratorService implements Runnable{
             Thread.sleep(1000); //da se spawnaju workeri i receiveri
         }
         catch(InterruptedException e){
-            throw new RuntimeException(e);
         }
 
         NodeReceiver nodeReciever = findNodeReciever(taskGenerator.getTaskGeneratorNumber());
@@ -70,12 +82,13 @@ public class TaskGeneratorService implements Runnable{
             int taskID = taskCount.incrementAndGet();
             Task task = generateTask(taskID, taskGenerator.getTaskLength());
 
-            sendTaskToQueue(task, nodeReciever.getTaskQueue());
             logger.info("Generator " + taskGenerator.getTaskGeneratorNumber() + ": spawned task " + taskID + ", putting in queue");
+            sendTaskToQueue(task, nodeReciever.getTaskQueue());
             try {
                 Thread.sleep(generateSleepLength(taskGenerator.getTaskFrequency()));
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                logger.info("Generator " + taskGenerator.getTaskGeneratorNumber() + " interrupted, simulation stop");
+                break;
             }
         }
     }
@@ -83,24 +96,14 @@ public class TaskGeneratorService implements Runnable{
 
     public Task generateTask(int taskCount, int taskLength){
         Random rand = new Random();
-        int randTaskLength;
-
-        do{
-            randTaskLength = rand.nextInt(101) - 50 + taskLength;
-        } while(randTaskLength <= 0);
-
+        int randTaskLength = rand.nextInt(101) + taskLength;
         Task task = new Task(taskCount, randTaskLength); //3000 ms za test
         return task;
     }
 
     public int generateSleepLength(int taskFrequency){
         Random rand = new Random();
-        int randSleepLength;
-
-        do{
-            randSleepLength = rand.nextInt(101) + 50 - taskFrequency;
-        } while(randSleepLength <= 0);
-
+        int randSleepLength = rand.nextInt(101) + 100 - taskFrequency;
         return randSleepLength;
     }
 

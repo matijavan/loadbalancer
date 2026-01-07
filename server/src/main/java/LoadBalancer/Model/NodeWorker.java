@@ -15,5 +15,4 @@ public class NodeWorker{
     public NodeWorker(int nodeWorkerNumber) {
         NodeWorkerNumber = nodeWorkerNumber;
     }
-
 }

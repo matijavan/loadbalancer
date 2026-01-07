@@ -31,8 +31,16 @@ public class NodeReceiverController {
 
     @PostMapping("/startall")
     public ResponseEntity<?> startAllNodeReceivers(){
+        System.out.println("Starting all Node Receivers");
         nodeReceiverService.startAllReceivers();
         return ResponseEntity.ok("Started all Node Receivers");
+    }
+
+    @PostMapping("/stopall")
+    public ResponseEntity<?> stopAllNodeReceivers(){
+        System.out.println("Stopping all Node Receivers");
+        nodeReceiverService.stopAllReceivers();
+        return ResponseEntity.ok("Stopped all Node Receivers");
     }
 
     @PostMapping("/capacity")

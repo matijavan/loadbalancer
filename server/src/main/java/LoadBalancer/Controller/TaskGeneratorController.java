@@ -50,7 +50,15 @@ public class TaskGeneratorController {
 
     @PostMapping("/startall")
     public ResponseEntity<?> startAllTaskGenerators() {
+        System.out.println("Starting all Node Receivers");
         taskGeneratorService.startAllTaskGenerators();
         return ResponseEntity.ok("Started all Task Generators");
+    }
+
+    @PostMapping("/stopall")
+    public ResponseEntity<?> stopAllTaskGenerators() {
+        System.out.println("Stopping all Node Receivers");
+        taskGeneratorService.stopAllTaskGenerators();
+        return ResponseEntity.ok("Stopped all Task Generators");
     }
 }

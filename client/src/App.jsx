@@ -242,12 +242,27 @@ export default function App() {
 
   const stopSimulation = async () => {
     try {
-      const response = await fetch(`${API_BASE}/nodeworker/stopall`, {
+      let response = await fetch(`${API_BASE}/taskgenerator/stopall`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });
-      const data = await tryParse(response);
+      let data = await tryParse(response);
       logApiCall("POST", "/nodeworker/stopall", null, data);
+
+      response = await fetch(`${API_BASE}/taskgenerator/stopall`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      data = await tryParse(response);
+      logApiCall("POST", "/nodereceiver/startall", null, data);
+
+      response = await fetch(`${API_BASE}/nodeworker/stopall`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      data = await tryParse(response);
+      logApiCall("POST", "/nodeworker/stopall", null, data);
+
       setSimulationRunning(false);
     } catch (error) {
       logApiCall("POST", "/nodeworker/stopall", null, null, error.message);

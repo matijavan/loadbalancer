@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import static LoadBalancer.Model.GlobalVariables.*;
@@ -16,6 +18,7 @@ import static LoadBalancer.Model.GlobalVariables.*;
 public class NodeWorkerService implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeWorkerService.class);
+    private final List<Thread> workerThreads = new LinkedList<>();
 
     @Override
     public void run() {
@@ -42,14 +45,17 @@ public class NodeWorkerService implements Runnable {
 
     public void startAllWorkers() {
         for (NodeWorker nw : nodeWorkerList) {
-            new Thread(() -> runWorker(nw)).start();
+            Thread t = new Thread(() -> runWorker(nw));
+            workerThreads.add(t);
+            t.start();
         }
     }
 
     public void stopAllWorkers() {
-        for (NodeWorker nw : nodeWorkerList) {
-            // ovdje treba implementirati logiku za zaustavljanje radnika
+        for(Thread t :  workerThreads){
+            t.interrupt();
         }
+        workerThreads.clear();
     }
 
     public void runWorker(NodeWorker nodeWorker) {
@@ -64,7 +70,8 @@ public class NodeWorkerService implements Runnable {
                 Thread.sleep(task.getLength());
                 logger.info("Worker " + nodeWorker.getNodeWorkerNumber() + " done with task " + task.getID());
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                logger.info("Worker " + nodeWorker.getNodeWorkerNumber() + " interrupted, simulation stop");
+                break;
             }
         }
     }

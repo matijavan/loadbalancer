@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static LoadBalancer.Model.GlobalVariables.nodeReceiverList;
 import static LoadBalancer.Model.GlobalVariables.nodeWorkerList;
@@ -14,6 +16,7 @@ import static LoadBalancer.Model.GlobalVariables.nodeWorkerList;
 @Service
 public class NodeReceiverService implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(NodeReceiverService.class);
+    private final List<Thread> receiverThreads = new LinkedList<>();
     @Override
     public void run() {}
 
@@ -47,13 +50,6 @@ public class NodeReceiverService implements Runnable {
         return loads;
     }
 
-    public void updateNodeReceiverLoadHistory(int nodeNumber){
-        NodeReceiver nodeReceiver = nodeReceiverList.get(nodeNumber);
-        LinkedList<Double> loadHistory = nodeReceiver.getNodeReceiverLoadHistory();
-        loadHistory.add(getNodeReceiverLoad(nodeNumber));
-        nodeReceiver.setNodeReceiverLoadHistory(loadHistory);
-    }
-
     public void changeNodeReceiverCapacity(int nodeNumber, int capacity){
         NodeReceiver nodeReceiver = nodeReceiverList.get(nodeNumber);
         nodeReceiver.setNodeReceiverCapacity(capacity);
@@ -61,7 +57,21 @@ public class NodeReceiverService implements Runnable {
 
     public void startAllReceivers(){
         for (NodeReceiver nr : nodeReceiverList){
-            new Thread(() -> runReceiver(nr)).start();
+            Thread t = new Thread(() -> runReceiver(nr));
+            receiverThreads.add(t);
+            t.start();
+        }
+    }
+
+    public void stopAllReceivers(){
+        for(Thread t : receiverThreads){
+            t.interrupt();
+        }
+
+        receiverThreads.clear();
+        //CLEARANJE TASKQUEUE NE RADI NE ZNAM ZAŠTO???????????????
+        for(NodeReceiver nr : nodeReceiverList){
+            nr.getTaskQueue().clear(); //očisti sve taskove, stopali smo simulation pa idemo od nule kad startamo opet
         }
     }
 

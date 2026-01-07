@@ -24,8 +24,7 @@ public class NodeWorkerController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addNodeWorker() {
-        System.out.println("Adding node number " + nodeCount);
-        NodeWorker nodeWorker = new NodeWorker(nodeCount);
+        System.out.println("Adding node number " + (nodeCount+1));
         nodeWorkerService.createNodeWorker(nodeCount);
         return ResponseEntity.ok(nodeWorkerList);
     }
