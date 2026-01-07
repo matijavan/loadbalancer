@@ -24,14 +24,21 @@ export default function App() {
   const [nodes, setNodes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [simulationRunning, setSimulationRunning] = useState(false);
+  const [loadedFile, setLoadedFile] = useState(null);
 
   useEffect(() => {
     fetchNodes();
-
-    //svakih 100ms da se updatea samo load svakog nodea
-    const interval = setInterval(fetchNodeLoads, 100); 
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!simulationRunning) return;
+
+    const interval = setInterval(fetchNodeLoads, 100);
+
+    return () => clearInterval(interval); 
+  }, [simulationRunning]);
+
+
 
   // fetchanje sa backenda
   const fetchNodes = async () => {
@@ -270,21 +277,80 @@ export default function App() {
     }
   };
 
+  const saveFunction = async() => {
+    try {
+      let response = await fetch(`${API_BASE}/taskhistory/save`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
+      }).then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "task_history.ser";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      })
+      } catch(error){
+        logApiCall("GET", "/taskhistory/save", null, null, error.message);
+        console.error("Failed to save task history:", error)
+      }
+  };
+
+  const loadFunction = async () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".ser";
+
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      setLoadedFile(file.name)
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch(`${API_BASE}/taskhistory/load`, {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) throw new Error("Upload failed");
+
+        alert("Task history loaded successfully");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to load task history");
+      }
+  };
+  input.click();
+};
+
   return (
     <div className="container">
       <div className="save-load-buttons">
         <button 
           className="save sim-btn"
+          onClick={saveFunction}
           disabled={loading || simulationRunning}
           >Save
         </button>
         <button
           className="load sim-btn"
+          onClick={loadFunction}
           disabled={loading || simulationRunning}
           >Load
         </button>
 
+        <p className="filename sim-btn">
+          {loadedFile}
+        </p>
+
       </div>
+      
       <div className="button-bar">
         <button 
           className="start sim-btn" 
@@ -408,4 +474,5 @@ export default function App() {
       </div>
     </div>
   );
-}
+};
+

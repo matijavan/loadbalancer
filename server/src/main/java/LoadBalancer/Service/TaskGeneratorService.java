@@ -3,10 +3,12 @@ package LoadBalancer.Service;
 import LoadBalancer.Model.NodeReceiver;
 import LoadBalancer.Model.Task;
 import LoadBalancer.Model.TaskGenerator;
+import LoadBalancer.Model.TaskSpawnEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +22,7 @@ public class TaskGeneratorService implements Runnable{
 
     private static final Logger logger = LoggerFactory.getLogger(NodeWorkerService.class);
     private final List<Thread> generatorThreads = new LinkedList<>();
+    private TaskHistoryService taskHistoryService = new TaskHistoryService();
 
     public void run() {
 
@@ -53,6 +56,8 @@ public class TaskGeneratorService implements Runnable{
     }
 
     public void startAllTaskGenerators(){
+        startSimulationTime = System.nanoTime();
+        taskHistoryService.clearTaskHistory();
         for (TaskGenerator tg : taskGeneratorList) {
             Thread t = new Thread(() -> runGenerator(tg));
             generatorThreads.add(t);
@@ -60,7 +65,7 @@ public class TaskGeneratorService implements Runnable{
         }
     }
 
-    public void stopAllTaskGenerators(){
+    public void stopAllTaskGenerators() {
         for(Thread t : generatorThreads){
             t.interrupt();
         }
@@ -80,7 +85,10 @@ public class TaskGeneratorService implements Runnable{
 
         while(true){
             int taskID = taskCount.incrementAndGet();
-            Task task = generateTask(taskID, taskGenerator.getTaskLength());
+            Task task = generateTask(taskID, taskGenerator.getTaskLength(), taskGenerator.getTaskGeneratorNumber());
+
+            TaskSpawnEvent event = new TaskSpawnEvent(task, taskGenerator.getTaskGeneratorNumber(), System.nanoTime() - startSimulationTime);
+            taskHistoryService.recordTask(event);
 
             logger.info("Generator " + taskGenerator.getTaskGeneratorNumber() + ": spawned task " + taskID + ", putting in queue");
             sendTaskToQueue(task, nodeReciever.getTaskQueue());
@@ -94,10 +102,11 @@ public class TaskGeneratorService implements Runnable{
     }
 
 
-    public Task generateTask(int taskCount, int taskLength){
+    public Task generateTask(int taskCount, int taskLength, int nodeID){
         Random rand = new Random();
         int randTaskLength = rand.nextInt(101) + taskLength;
-        Task task = new Task(taskCount, randTaskLength); //3000 ms za test
+        Task task = new Task(taskCount, randTaskLength);
+        TaskSpawnEvent event = new TaskSpawnEvent(task, nodeID, System.nanoTime() - startSimulationTime);
         return task;
     }
 

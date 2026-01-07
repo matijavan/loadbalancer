@@ -1,7 +1,9 @@
 package LoadBalancer.Model;
 
 
-public class Task {
+import java.io.Serializable;
+
+public class Task implements Serializable {
     private int ID;
     private int length; //in milliseconds
 

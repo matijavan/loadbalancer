@@ -9,6 +9,7 @@ public class GlobalVariables {
     public static LinkedList<NodeWorker> nodeWorkerList = new LinkedList<>();
     public static LinkedList<TaskGenerator> taskGeneratorList = new LinkedList<>();
     public static int nodeCount = 0;
+    public static long startSimulationTime;
 
     public AtomicInteger getTaskCount() {
         return taskCount;
