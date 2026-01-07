@@ -272,6 +272,19 @@ export default function App() {
 
   return (
     <div className="container">
+      <div className="save-load-buttons">
+        <button 
+          className="save sim-btn"
+          disabled={loading || simulationRunning}
+          >Save
+        </button>
+        <button
+          className="load sim-btn"
+          disabled={loading || simulationRunning}
+          >Load
+        </button>
+
+      </div>
       <div className="button-bar">
         <button 
           className="start sim-btn" 
