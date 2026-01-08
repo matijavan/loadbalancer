@@ -362,6 +362,11 @@ export default function App() {
         </div>
 
       <div className="file-row">
+        {loadedFile && (
+          <button
+          className = "start-loaded sim-btn"
+          >Start loaded simulation</button>
+        )}
         <p className="filename">
           {loadedFile}
         </p>

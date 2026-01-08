@@ -45,7 +45,7 @@ public class NodeReceiverController {
 
     @PostMapping("/capacity")
     public ResponseEntity<?> changeNodeReceiverCapacity(@RequestBody CapacityRequest capacityRequest){
-        int nodeNumber = capacityRequest.getNodeNumber();
+        int nodeNumber = capacityRequest.getNodeNumber() - 1;
         int newCapacity = capacityRequest.getCapacity();
         System.out.println("Node: " + nodeNumber + " Capacity: " + newCapacity);
         nodeReceiverService.changeNodeReceiverCapacity(nodeNumber, newCapacity);

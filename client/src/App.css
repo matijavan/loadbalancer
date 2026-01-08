@@ -17,6 +17,12 @@
   cursor: pointer;
 }
 
+.start-loaded{
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+}
+
 .save{
   background-color: #4CAF50;
   color: white;
