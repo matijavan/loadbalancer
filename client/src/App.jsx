@@ -293,6 +293,7 @@ export default function App() {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       })
+      logApiCall("GET", "/taskhistory/save", null, null, data);
       } catch(error){
         logApiCall("GET", "/taskhistory/save", null, null, error.message);
         console.error("Failed to save task history:", error)
@@ -306,7 +307,6 @@ export default function App() {
 
     input.onchange = async (e) => {
       const file = e.target.files[0];
-      setLoadedFile(file.name)
       if (!file) return;
 
       const formData = new FormData();
@@ -318,16 +318,31 @@ export default function App() {
           body: formData
         });
 
-        if (!response.ok) throw new Error("Upload failed");
+        logApiCall("POST", "/taskhistory/load", null, null, null);
 
-        alert("Task history loaded successfully");
+        if (!response.ok) throw new Error("Upload failed");
+        setLoadedFile(file.name)
       } catch (err) {
+        logApiCall("POST", "/taskhistory/load", null, null, err.message);
         console.error(err);
-        alert("Failed to load task history");
       }
+    };
+    input.click();
   };
-  input.click();
-};
+
+  const deleteLoadedFunction = async() => {
+    try {
+      const response = await fetch(`${API_BASE}/taskhistory/delete`, {
+          method: "DELETE"
+        });
+        logApiCall("GET", "/taskhistory/delete", null, null, null);
+
+      setLoadedFile(null)
+    } catch(error) {
+      logApiCall("GET", "/taskhistory/delete", null, null, error.message);
+      console.error("Error while deleting loaded history" + error);
+    }
+  }
 
   return (
     <div className="container">
@@ -344,11 +359,29 @@ export default function App() {
           disabled={loading || simulationRunning}
           >Load
         </button>
+        </div>
 
-        <p className="filename sim-btn">
+      <div className="file-row">
+        <p className="filename">
           {loadedFile}
         </p>
-
+        {loadedFile && (
+          <button
+          className="trash-btn"
+          onClick={deleteLoadedFunction}
+          title={`Delete loaded file history`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="20"
+            height="20"
+            fill="currentColor"
+          >
+            <path d="M9 3V4H4V6H5V20C5 21.1 5.9 22 7 22H17C18.1 22 19 21.1 19 20V6H20V4H15V3H9M7 6H17V20H7V6Z" />
+          </svg>
+        </button>
+        )}
       </div>
       
       <div className="button-bar">

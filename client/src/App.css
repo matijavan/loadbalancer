@@ -29,6 +29,11 @@
   border: none;
 }
 
+.file-row {
+  display: flex;
+  align-items: center;             
+}
+
 .start {
   background-color: #4CAF50;
   color: white;

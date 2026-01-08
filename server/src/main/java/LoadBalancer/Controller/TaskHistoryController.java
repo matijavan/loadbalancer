@@ -22,6 +22,7 @@ public class TaskHistoryController {
     @GetMapping("/save")
     public ResponseEntity<byte[]> saveHistory() throws IOException {
         byte[] fileBytes = taskHistoryService.serializeHistory();
+        System.out.println("Saved file");
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=task_history.ser")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -31,6 +32,14 @@ public class TaskHistoryController {
     @PostMapping("/load")
     public ResponseEntity<Void> loadHistory(@RequestParam("file") MultipartFile file) throws IOException, ClassNotFoundException {
         taskHistoryService.loadHistory(file.getInputStream());
+        System.out.println("Loaded file: " +  file.getOriginalFilename());
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteHistory() throws IOException, ClassNotFoundException {
+        taskHistoryService.deleteLoadedHistory();
+        System.out.println("Deleted loaded file");
         return ResponseEntity.ok().build();
     }
 }

@@ -46,4 +46,7 @@ public class TaskHistoryService {
         }
     }
 
+    public void deleteLoadedHistory() {
+        taskHistory.clear();
+    }
 }
