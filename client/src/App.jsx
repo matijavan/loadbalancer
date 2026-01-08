@@ -442,6 +442,7 @@ export default function App() {
                       onChange={(e) =>
                         updateNode(displayId, "freq", e.target.value)
                       }
+                      disabled={loadedFile}
                       className="slider"
                     />
                   </td>
@@ -455,6 +456,7 @@ export default function App() {
                       onChange={(e) =>
                         updateNode(displayId, "length", e.target.value)
                       }
+                      disabled={loadedFile}
                       className="slider"
                     />
                   </td>
