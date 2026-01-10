@@ -254,9 +254,9 @@ export default function App() {
         headers: { "Content-Type": "application/json" }
       });
       let data = await tryParse(response);
-      logApiCall("POST", "/nodeworker/stopall", null, data);
+      logApiCall("POST", "/taskgenerator/stopall", null, data);
 
-      response = await fetch(`${API_BASE}/taskgenerator/stopall`, {
+      response = await fetch(`${API_BASE}/nodereceiver/stopall`, {
         method: "POST",
         headers: { "Content-Type": "application/json" }
       });
@@ -293,7 +293,7 @@ export default function App() {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
       })
-      logApiCall("GET", "/taskhistory/save", null, null, data);
+      logApiCall("GET", "/taskhistory/save", null, null, null);
       } catch(error){
         logApiCall("GET", "/taskhistory/save", null, null, error.message);
         console.error("Failed to save task history:", error)
@@ -330,6 +330,39 @@ export default function App() {
     input.click();
   };
 
+  const startLoadedSimulation = async() => {
+    try {
+      //prvo starta generatora JEDNOG JEDINOG
+    let response = await fetch(`${API_BASE}/taskhistory/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    let data = await tryParse(response);
+    logApiCall("POST", "/taskhistory/start", null, data);
+
+      //onda starta node receivere
+    response = await fetch(`${API_BASE}/nodereceiver/startall`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    data = await tryParse(response);
+    logApiCall("POST", "/nodereceiver/startall", null, data);
+
+    //onda starta node workere
+    response = await fetch(`${API_BASE}/nodeworker/startall`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    data = await tryParse(response);
+    logApiCall("POST", "/nodeworker/startall", null, data)
+
+    setSimulationRunning(true);
+    } catch (error) {
+      logApiCall("POST", "/taskhistory/start", null, null, error.message);
+      console.error("Failed to start loaded simulation:", error);
+    }
+  }
+
   const deleteLoadedFunction = async() => {
     try {
       const response = await fetch(`${API_BASE}/taskhistory/delete`, {
@@ -365,6 +398,8 @@ export default function App() {
         {loadedFile && (
           <button
           className = "start-loaded sim-btn"
+          onClick={startLoadedSimulation}
+          disabled={simulationRunning}
           >Start loaded simulation</button>
         )}
         <p className="filename">
@@ -393,7 +428,7 @@ export default function App() {
         <button 
           className="start sim-btn" 
           onClick={startSimulation}
-          disabled={loading || simulationRunning}
+          disabled={loading || simulationRunning || loadedFile}
         >
           Start Simulation
         </button>

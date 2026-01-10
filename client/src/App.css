@@ -46,10 +46,20 @@
   border: none;
 }
 
+.start:disabled{
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .stop {
   background-color: #f44336;
   color: white;
   border: none;
+}
+
+.stop:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 .pause {

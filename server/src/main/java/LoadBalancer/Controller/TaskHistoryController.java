@@ -2,6 +2,7 @@ package LoadBalancer.Controller;
 
 import LoadBalancer.Service.TaskHistoryService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,20 @@ public class TaskHistoryController {
     public ResponseEntity<Void> deleteHistory() throws IOException, ClassNotFoundException {
         taskHistoryService.deleteLoadedHistory();
         System.out.println("Deleted loaded file");
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/start")
+    public ResponseEntity<?> startGenerationOfLoadedTasks () throws IOException {
+        taskHistoryService.startLoadedGenerationOfTasks();
+        System.out.println("Starting loaded simulation");
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/stop")
+    public ResponseEntity<?> stopGenerationOfLoadedTasks () throws IOException {
+        taskHistoryService.stopLoadedGenerationOfTasks();
+        System.out.println("Stopping loaded simulation");
         return ResponseEntity.ok().build();
     }
 }

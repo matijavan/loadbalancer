@@ -20,7 +20,7 @@ import static LoadBalancer.Model.GlobalVariables.*;
 @Service
 public class TaskGeneratorService implements Runnable{
 
-    private static final Logger logger = LoggerFactory.getLogger(NodeWorkerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskGeneratorService.class);
     private final List<Thread> generatorThreads = new LinkedList<>();
     private TaskHistoryService taskHistoryService = new TaskHistoryService();
 
@@ -71,6 +71,7 @@ public class TaskGeneratorService implements Runnable{
         }
         generatorThreads.clear();
         taskCount.set(0); //stopali smo simulaciju pa idemo ispocetka
+        logger.info("Amount of tasks in this simulation: " + taskSpawnEventList.size());
     }
 
     public void runGenerator(TaskGenerator taskGenerator){
@@ -88,7 +89,8 @@ public class TaskGeneratorService implements Runnable{
             Task task = generateTask(taskID, taskGenerator.getTaskLength(), taskGenerator.getTaskGeneratorNumber());
 
             TaskSpawnEvent event = new TaskSpawnEvent(task, taskGenerator.getTaskGeneratorNumber(), System.nanoTime() - startSimulationTime);
-            taskHistoryService.recordTask(event);
+            //taskHistoryService.recordTask(event);
+            taskSpawnEventList.add(event);
 
             logger.info("Generator " + taskGenerator.getTaskGeneratorNumber() + ": spawned task " + taskID + ", putting in queue");
             sendTaskToQueue(task, nodeReciever.getTaskQueue());
@@ -100,7 +102,6 @@ public class TaskGeneratorService implements Runnable{
             }
         }
     }
-
 
     public Task generateTask(int taskCount, int taskLength, int nodeID){
         Random rand = new Random();
@@ -116,7 +117,7 @@ public class TaskGeneratorService implements Runnable{
         return randSleepLength;
     }
 
-    public NodeReceiver findNodeReciever(int number) {
+    public static NodeReceiver findNodeReciever(int number) {
         for (NodeReceiver nr : nodeReceiverList) {
             if (nr.getNodeReceiverNumber() == number) {
                 return nr;
@@ -125,7 +126,7 @@ public class TaskGeneratorService implements Runnable{
         return null;
     }
 
-    public void sendTaskToQueue(Task task, BlockingQueue<Task> taskQueue){
+    public static void sendTaskToQueue(Task task, BlockingQueue<Task> taskQueue){
         taskQueue.offer(task);
     }
 }

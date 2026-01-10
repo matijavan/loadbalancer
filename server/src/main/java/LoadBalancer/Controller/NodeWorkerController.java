@@ -43,7 +43,7 @@ public class NodeWorkerController {
 
     @PostMapping("/stopall")
     public ResponseEntity<?> stopAllNodeWorkers() {
-        System.out.println("Stopping all workers");
+        System.out.println("Stopping all Node Workers");
         nodeWorkerService.stopAllWorkers();
         return ResponseEntity.ok("Stopped all Node Workers");
     }
